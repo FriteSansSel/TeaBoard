@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
+import { SERVER_DOMAIN, PORT } from '../utils/configs';
 
 const OrdersContext = createContext();
 export const useOrders = () => useContext(OrdersContext);
@@ -32,44 +33,81 @@ export const OrdersProvider = ({ children }) => {
         return [];
     });
 
-    const params = new URLSearchParams({
-        opened: 'true',
-        expand: 'items',
-    });
+    // const params = "from=2025-08-28&to=2025-08-28&expand[]=items&expand[]=transactions.method&expand[]=transactions";
+    // useEffect(() => {
+    //     const getOrders = async () => {
+    //         const newOrders = await fetchOrdersWithQRCode(params);
+    //         console.log('Fetched orders with QR code:', newOrders);
+    //         // const newTransactions = await fetchOrders(paramsTransactions.toString());
 
-    const paramsTransactions = new URLSearchParams({
-        opened: 'true',
-        expand: 'transactions',
-    });
+    //         // const ordersMerged = newOrders.map(order => {
+    //         //     const match = newTransactions.find(t => t.id === order.id);
+    //         //     if (!match) {console.log('No matching transactions for order:', order.id);}
+    //         //     return {
+    //         //         ...order,
+    //         //         transactions: match ? match.transactions : [],
+    //         //     }
+    //         // })
+    //         // setOrders(prevOrders => {
+    //         //     const updated = [
+    //         //         ...ordersMerged,
+    //         //         ...prevOrders.filter(o => !ordersMerged.some(no => no.id === o.id))
+    //         //     ]
+    //         //     // console.log('Orders:', updated);
+    //         //     localStorage.setItem('orders', JSON.stringify(updated));
+    //         //     return updated;
+    //         // })
+    //     };
+
+    //     getOrders();
+    //     // const interval = setInterval(getOrders, 2000);
+    //     // return () => clearInterval(interval);
+    // }, []);
 
     useEffect(() => {
-        const getOrders = async () => {
-            const newOrders = await fetchOrdersWithQRCode(params.toString());
-            const newTransactions = await fetchOrders(paramsTransactions.toString());
+        let ws;
 
-            const ordersMerged = newOrders.map(order => {
-                const match = newTransactions.find(t => t.id === order.id);
-                if (!match) {console.log('No matching transactions for order:', order.id);}
-                return {
-                    ...order,
-                    transactions: match ? match.transactions : [],
-                }
-            })
-            setOrders(prevOrders => {
+        const connect = () => {
+            ws = new WebSocket("ws://" + SERVER_DOMAIN + ":" + PORT);
+
+            ws.onopen = () => {
+            console.log("✅ WebSocket connected");
+            };
+
+            ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("📩 WebSocket message received :", data);
+
+            if (data.type === "ORDER_ENDED") {
+                const newOrders = data.payload;
+                setOrders((prevOrders) => {
                 const updated = [
-                    ...ordersMerged,
-                    ...prevOrders.filter(o => !ordersMerged.some(no => no.id === o.id))
-                ]
-                // console.log('Orders:', updated);
-                localStorage.setItem('orders', JSON.stringify(updated));
+                    ...newOrders,
+                    ...prevOrders.filter((o) => !newOrders.some((no) => no.id === o.id)),
+                ];
+                localStorage.setItem("orders", JSON.stringify(updated));
                 return updated;
-            })
+                });
+            }
+            };
+
+            ws.onclose = () => {
+            console.log("⚠️ WebSocket closed, attempting to reconnect...");
+            setTimeout(connect, 2000);
+            };
+
+            ws.onerror = (err) => {
+            console.error("❌ Websocket error:", err);
+            ws.close();
+            };
         };
 
-        getOrders();
-        const interval = setInterval(getOrders, 2000);
-        return () => clearInterval(interval);
-    }, []);
+        connect();
+
+        return () => {
+            if (ws) ws.close();
+        };
+        }, []);
 
     const closeItemByQRCode = (qrCode) => {
         setOrders(prevOrders => {

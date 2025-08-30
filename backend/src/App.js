@@ -8,5 +8,6 @@ const app = express();
 app.use(cors());
 
 app.use('/orders', ordersRouter);
+app.use('/webhook', webhookRouter);
 
 export default app;

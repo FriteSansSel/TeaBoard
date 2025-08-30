@@ -20,6 +20,7 @@ export const fetchOrders = async (params) => {
 
 export const fetchOrdersWithQRCode = async (params) => {
             try {
+                console.log("req:", SERVER_URL + routesRequest.orders + "/with-qr?" + params);
                 const res = await fetch(SERVER_URL + routesRequest.orders + "/with-qr?" + params)
 
                 if (!res.ok) {
