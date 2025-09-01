@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { ordersRouter } from './routes/OrdersRoute.js';
+import { webhookRouter } from './routes/WebhookRoute.js';
 
 const app = express();
 

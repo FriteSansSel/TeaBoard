@@ -10,17 +10,16 @@ const OrdersState = () => {
             return false;
         }
         const totalPaid = order.transactions.reduce((sum, t) => sum + t.price, 0);
-        // console.log('Total paid:', totalPaid, 'Order price:', order.price.final_amount_inc_tax);
         return totalPaid === order.price.final_amount_inc_tax;
-    }
+        };
 
     return (
         <div className="status-container">
             <div className="status-column">
                 <h2>En cours</h2>
-                {orders.filter(o => o.status === 'opened').map(o => (
+                {orders.filter(o => o.status === 'closed').map(o => (
                     <div key={o.id} className="order-item">
-                        {o.display_id} 
+                        {o.display_id}
                         {!hasMatchingTransactions(o) && <span> - À payer</span>}
                     </div>
                 ))}
@@ -28,13 +27,14 @@ const OrdersState = () => {
 
             <div className="status-column">
                 <h2>Terminées</h2>
-                {orders.filter(o => o.status === 'closed').map(o => (
+                {orders.filter(o => o.status === 'ready').map(o => (
                     <div key={o.id} className="order-item">
                         {o.display_id}
                     </div>
                 ))}
             </div>
         </div>
+
     )
 }
 

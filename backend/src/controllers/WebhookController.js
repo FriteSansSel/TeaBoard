@@ -1,27 +1,28 @@
-import { fetchOrdersWithQRCodeInternal } from './OrdersController.js';
-import { ZELTY_API, API_KEY } from '../utils/configs.js';
-import { routesZelty } from '../utils/constants.js';
+import { fetchOrderWithQRCodeInternal } from "../controllers/OrdersController.js";
+import { broadcast } from "../server.js";
 
 export const handleWebhook = async (req, res) => {
-  try {
-    const event = req.body;
-    console.log("Webhook:", event);
+    try {
+        const event = req.body;
 
-    if (event.type === "order.ended") {
-      const orderId = event.data?.id;
-      console.log("Order id:", orderId);
+        if (event.event_name === "order.ended") {
+            const orderId = event.data?.id;
 
-      const params = `id=${orderId}&expand[]=items&expand[]=transactions&expand[]=transactions.method`;
-      const ordersWithQRCode = await fetchOrdersWithQRCodeInternal(params);
+            const params = `/${orderId}?expand[]=items&expand[]=transactions&expand[]=transactions.method`;
+            const orderWithQRCode = await fetchOrderWithQRCodeInternal(params);
 
-      console.log("Order :", ordersWithQRCode);
+            if (!orderWithQRCode) {
+                throw new Error(`No order found for id=${orderId}`);
+            }
 
-      broadcast({ type: "ORDER_ENDED", payload: ordersWithQRCode });
+            console.log("Order with QR codes :", orderWithQRCode);
+
+            broadcast({ type: "ORDER_ENDED", payload: [orderWithQRCode] });
+        }
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error("Error in handleWebhook:", err);
+        res.sendStatus(500);
     }
-
-    res.sendStatus(200);
-  } catch (err) {
-    console.error("Erreur webhook :", err);
-    res.sendStatus(500);
-  }
 };

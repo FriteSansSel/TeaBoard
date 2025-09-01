@@ -20,14 +20,14 @@ const Orders = () => {
                     <div className="order-content">
                         <div className="order-details">
                             <div className="order-header">
-                                Commande #{o.display_id} {o.status === 'opened' ? '❌' : '✅'}
+                                Commande #{o.display_id} {o.status === 'closed' ? '❌' : '✅'}
                             </div>
 
                             <ul className="order-items">
                                 {o.items.map((item, i) => (
                                     <li key={i}>
                                         <div>
-                                            {item.name} {item.status === 'opened' ? '❌' : '✅'}
+                                            {item.name} {item.status === 'closed' ? '❌' : '✅'}
                                         </div>
                                         {item.qrCode && (
                                             <img
@@ -42,7 +42,7 @@ const Orders = () => {
                             </ul>
                         </div>
 
-                        {o.status === 'closed' && (
+                        {o.status === 'ready' && (
                             <button
                                 className="order-done-button"
                                 onClick={() => removeOrder(o.id)}

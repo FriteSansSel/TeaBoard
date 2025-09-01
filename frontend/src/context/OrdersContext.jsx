@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
-import { SERVER_DOMAIN, PORT } from '../utils/configs';
 
 const OrdersContext = createContext();
 export const useOrders = () => useContext(OrdersContext);
 
 export const OrdersProvider = ({ children }) => {
+    const PORT = import.meta.env.PORT || "8000";
+    const SERVER_DOMAIN = import.meta.env.SERVER_DOMAIN || "localhost";
     const [orders, setOrders] = useState(() => {
         const saved = localStorage.getItem('orders');
 
@@ -64,6 +65,10 @@ export const OrdersProvider = ({ children }) => {
     //     // return () => clearInterval(interval);
     // }, []);
 
+    // useEffect(() => {
+    //     localStorage.removeItem('orders');
+    // }, []);
+
     useEffect(() => {
         let ws;
 
@@ -111,27 +116,27 @@ export const OrdersProvider = ({ children }) => {
 
     const closeItemByQRCode = (qrCode) => {
         setOrders(prevOrders => {
-            console.log('Closing item by QR code:', qrCode);
+            console.log('Item ready by QR code:', qrCode);
             const updatedOrders = prevOrders.map(order => {
                 if (qrCode.orderId === order.id) {
                     const updatedItems = order.items.map(item => 
                         qrCode.itemId === item.id
-                            ? { ...item, status: 'closed' }
+                            ? { ...item, status: 'ready' }
                             : item
                     );
-                    const allClosed = updatedItems.every(item => item.status === 'closed');
+                    const allReady = updatedItems.every(item => item.status === 'ready');
 
-                    if (allClosed) {console.log('All items closed for order:', order.id);}
+                    if (allReady) {console.log('All items ready for order:', order.id);}
 
                     return {
                         ...order,
                         items: updatedItems,
-                        status: allClosed ? 'closed' : order.status,
+                        status: allReady ? 'ready' : order.status,
                     };
                 }
                 return order;
             });
-            console.log('Updated orders after closing item:', updatedOrders);
+            console.log('Updated orders after ready item:', updatedOrders);
             localStorage.setItem('orders', JSON.stringify(updatedOrders));
             return updatedOrders;
         });
