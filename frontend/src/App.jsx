@@ -7,16 +7,16 @@ import Orders from './pages/Orders.jsx'
 import History from './pages/History.jsx'
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path={routes.menu} element={<Menu />} />
-        <Route path={routes.ordersstate} element={<OrdersState />} />
-        <Route path={routes.orders} element={<Orders />} />
-        <Route path={routes.history} element={<History />} />
-      </Routes>
-    </Router>
-  )
+    return (
+        <Router>
+            <Routes>
+                <Route path={routes.menu} element={<Menu />} />
+                <Route path={routes.ordersstate} element={<OrdersState />} />
+                <Route path={routes.orders} element={<Orders />} />
+                <Route path={routes.history} element={<History />} />
+            </Routes>
+        </Router>
+    )
 }
 
 export default App;

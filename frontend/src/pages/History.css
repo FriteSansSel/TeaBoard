@@ -1,33 +1,33 @@
 .history-container {
-  display: flex;
-  flex-direction: column;
-  font-family: Arial, sans-serif;
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 100%;
-  margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .history-card {
-  border: 2px solid #6c757d;
-  border-radius: 8px;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 2px solid #6c757d;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .history-header {
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #343a40;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #343a40;
 }
 
 .history-items {
-  margin: 0;
-  padding-left: 1.2rem;
+    margin: 0;
+    padding-left: 1.2rem;
 }
 
 .history-item {
-  margin-bottom: 0.3rem;
+    margin-bottom: 0.3rem;
 }

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
+// import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
+import { printTicket } from '../utils/printTicket';
+import { connectPrinter, disconnectPrinter } from '../utils/printerService';
 
 const OrdersContext = createContext();
 export const useOrders = () => useContext(OrdersContext);
@@ -70,6 +72,14 @@ export const OrdersProvider = ({ children }) => {
     // }, []);
 
     useEffect(() => {
+        connectPrinter();
+
+        return () => {
+            disconnectPrinter();
+        };
+    }, []);
+
+    useEffect(() => {
         let ws;
 
         const connect = () => {
@@ -80,20 +90,35 @@ export const OrdersProvider = ({ children }) => {
             };
 
             ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log("📩 WebSocket message received :", data);
+                const data = JSON.parse(event.data);
+                console.log("📩 WebSocket message received :", data);
 
-            if (data.type === "ORDER_ENDED") {
-                const newOrders = data.payload;
-                setOrders((prevOrders) => {
-                const updated = [
-                    ...newOrders,
-                    ...prevOrders.filter((o) => !newOrders.some((no) => no.id === o.id)),
-                ];
-                localStorage.setItem("orders", JSON.stringify(updated));
-                return updated;
-                });
-            }
+                if (data.type === "ORDER_ENDED") {
+                    const newOrders = data.payload;
+
+                    (async () => {
+                        for (const order of newOrders) {
+                            for (const item of order.items) {
+                                try {
+                                    console.log(`🖨️ Ticket printing for ${item.name}`);
+                                    await printTicket(order, item);
+                                    console.log(`✅ Ticket printed for ${item.name}`);
+                                } catch (err) {
+                                    console.error(`❌ Print error for ${item.name}`, err);
+                                }
+                            }
+                        }
+                    })();
+
+                    setOrders((prevOrders) => {
+                    const updated = [
+                        ...newOrders,
+                        ...prevOrders.filter((o) => !newOrders.some((no) => no.id === o.id)),
+                    ];
+                    localStorage.setItem("orders", JSON.stringify(updated));
+                    return updated;
+                    });
+                }
             };
 
             ws.onclose = () => {

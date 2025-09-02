@@ -5,10 +5,10 @@ import { OrdersProvider } from './context/OrdersContext.jsx'
 import QRScanListener from './components/QRScanListener.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+    // <StrictMode>
     <OrdersProvider>
-      <QRScanListener />
-      <App />
+        <QRScanListener />
+        <App />
     </OrdersProvider>
-  </StrictMode>,
+    // </StrictMode>,
 )

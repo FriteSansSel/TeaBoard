@@ -1,62 +1,62 @@
 .orders-container {
-  display: flex;
-  flex-direction: column;
-  font-family: Arial, sans-serif;
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 100%;
-  margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .order-card {
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  padding: 1rem;
-  background-color: #f5faff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #f5faff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .order-content {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
 }
 
 .order-details {
-  flex: 1;
+    flex: 1;
 }
 
 .order-header {
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #0056b3;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #0056b3;
 }
 
 .order-items {
-  margin: 0;
-  padding-left: 1.2rem;
+    margin: 0;
+    padding-left: 1.2rem;
 }
 
 .order-items li {
-  margin-bottom: 0.3rem;
+    margin-bottom: 0.3rem;
 }
 
 .order-done-button {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 1.1rem;
-  transition: background-color 0.2s ease;
-  height: 100%;
-  align-self: stretch;
-  white-space: nowrap;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: background-color 0.2s ease;
+    height: 100%;
+    align-self: stretch;
+    white-space: nowrap;
 }
 
 .order-done-button:hover {
-  background-color: #218838;
+    background-color: #218838;
 }

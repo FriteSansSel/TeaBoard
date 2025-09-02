@@ -1,6 +1,7 @@
 import React from 'react';
 import { useOrders } from '../context/OrdersContext';
 import BackButton from '../components/BackButton';
+import { printTicket } from '../utils/printTicket';
 import './Orders.css';
 
 const Orders = () => {
@@ -25,10 +26,11 @@ const Orders = () => {
 
                             <ul className="order-items">
                                 {o.items.map((item, i) => (
-                                    <li key={i}>
+                                    <li key={i} className="order-item">
                                         <div>
                                             {item.name} {item.status === 'closed' ? '❌' : '✅'}
                                         </div>
+
                                         {item.qrCode && (
                                             <img
                                                 src={item.qrCode}
@@ -37,6 +39,12 @@ const Orders = () => {
                                                 style={{ width: '120px', marginTop: '0.5rem' }}
                                             />
                                         )}
+                                        <button
+                                            className="order-done-button"
+                                            onClick={() => printTicket(o, item)}
+                                        >
+                                            🖨️ Imprimer
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
