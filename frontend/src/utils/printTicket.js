@@ -16,8 +16,8 @@ export const printTicket = async (order, item) => {
         const currentIndex = order.items.findIndex(i => i.id === item.id) + 1;
 
         let text = "";
-        text += `Restaurant: ${RESTO_NAME}\n`;
-        text += `Adresse: ${RESTO_ADDRESS}\n`;
+        text += `${RESTO_NAME}\n`;
+        text += `${RESTO_ADDRESS}\n`;
         text += "------------------------\n";
         text += `Commande N°: ${order.display_id}\n`;
         text += `Date: ${new Date(order.created_at).toLocaleString()}\n`;

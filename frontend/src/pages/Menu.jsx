@@ -9,20 +9,23 @@ const Menu = () => {
     const navigate = useNavigate();
     const [connected, setConnected] = useState(isPrinterConnected());
 
+    const checkConnection = async () => {
+        setConnected(await isPrinterConnected());
+    };
+
     // To refresh the connection status at the mount of the component
     useEffect(() => {
         const timer = setTimeout(() => {
-            setConnected(isPrinterConnected());
+            checkConnection();
         }, 1);
 
         return () => clearTimeout(timer);
     }, []);
 
-
     const handleConnect = async () => {
         try {
             await connectPrinter();
-            setConnected(true);
+            checkConnection();
         } catch (err) {
             console.error(err);
             alert("❌ Connection error: " + err.message);
@@ -32,7 +35,7 @@ const Menu = () => {
     const handleDisconnect = async () => {
         try {
             await disconnectPrinter();
-            setConnected(false);
+            checkConnection();
         } catch (err) {
             console.error(err);
             alert("❌ Disconnection error: " + err.message);
@@ -46,7 +49,7 @@ const Menu = () => {
 
             <button className="button" onClick={() => navigate(routes.orders)}>Commandes</button>
             <button className="button" onClick={() => window.open(routes.ordersstate)}>État des commandes</button>
-            <button className="button" onClick={() => navigate(routes.history)}>Historique</button>
+            {/* <button className="button" onClick={() => navigate(routes.history)}>Historique</button> */}
 
             <div style={{ margin: "1rem 0", fontWeight: "bold" }}>
                 Imprimante :{" "}

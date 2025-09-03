@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOrders } from '../context/OrdersContext';
 import BackButton from '../components/BackButton';
-import { printTicket } from '../utils/printTicket';
+import { enqueuePrint } from "../utils/printQueue";
 import './Orders.css';
 
 const Orders = () => {
@@ -41,7 +41,7 @@ const Orders = () => {
                                         )}
                                         <button
                                             className="order-done-button"
-                                            onClick={() => printTicket(o, item)}
+                                            onClick={() => enqueuePrint(o, item)}
                                         >
                                             🖨️ Imprimer
                                         </button>

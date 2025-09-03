@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
-import { printTicket } from '../utils/printTicket';
 import { connectPrinter, disconnectPrinter } from '../utils/printerService';
+import { enqueuePrint } from "../utils/printQueue";
 
 const OrdersContext = createContext();
 export const useOrders = () => useContext(OrdersContext);
@@ -101,7 +101,7 @@ export const OrdersProvider = ({ children }) => {
                             for (const item of order.items) {
                                 try {
                                     console.log(`🖨️ Ticket printing for ${item.name}`);
-                                    await printTicket(order, item);
+                                    await enqueuePrint(order, item);
                                     console.log(`✅ Ticket printed for ${item.name}`);
                                 } catch (err) {
                                     console.error(`❌ Print error for ${item.name}`, err);

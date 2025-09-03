@@ -28,4 +28,10 @@ export const disconnectPrinter = async () => {
 
 export const getPrinterManager = () => printerManager;
 
-export const isPrinterConnected = () => printerManager !== null;
+export const isPrinterConnected = async () => {
+    if (!printerManager) return false;
+
+    const result = await printerManager.start({});
+    return result.errorCode === 0;
+};
+
