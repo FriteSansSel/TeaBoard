@@ -34,8 +34,8 @@ const CastButton = () => {
         <div style={{ position: 'fixed', top: 10, right: 10 }}>
             <google-cast-launcher
                 style={{
-                    width: 48,
-                    height: 48,
+                    width: 18,
+                    height: 18,
                     '--connected-color': '#28a745',
                     '--disconnected-color': '#007bff',
                 }}

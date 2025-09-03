@@ -11,8 +11,8 @@ export const SERVER_URL = isProd
 
 // WebSocket
 export const WS_URL = isProd
-  ? `wss://${SERVER_DOMAIN}`
-  : `ws://${SERVER_DOMAIN}:${SERVER_PORT}`;
+  ? `wss://${SERVER_DOMAIN}/ws`
+  : `ws://${SERVER_DOMAIN}:${SERVER_PORT}/ws`;
 
 // Constants resto
 export const RESTO_NAME = "Stella Café";
