@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 // import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
 import { connectPrinter, disconnectPrinter } from '../utils/printerService';
 import { enqueuePrint } from "../utils/printQueue";
+import { WS_URL } from '../utils/configs';
 
 const OrdersContext = createContext();
 export const useOrders = () => useContext(OrdersContext);
@@ -83,7 +84,7 @@ export const OrdersProvider = ({ children }) => {
         let ws;
 
         const connect = () => {
-            ws = new WebSocket("ws://" + SERVER_DOMAIN + ":" + PORT);
+            ws = new WebSocket(WS_URL);
 
             ws.onopen = () => {
             console.log("✅ WebSocket connected");
