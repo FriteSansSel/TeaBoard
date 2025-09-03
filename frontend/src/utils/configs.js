@@ -1,8 +1,8 @@
 const isProd = import.meta.env.MODE === "production";
 
-const SERVER_PROTOCOL = import.meta.env.SERVER_PROTOCOL || "http";
-const SERVER_DOMAIN = import.meta.env.SERVER_DOMAIN || "localhost";
-const SERVER_PORT = isProd ? "" : (import.meta.env.SERVER_PORT || "8000");
+const SERVER_PROTOCOL = import.meta.env.VITE_SERVER_PROTOCOL || "http";
+const SERVER_DOMAIN = import.meta.env.VITE_SERVER_DOMAIN || "localhost";
+const SERVER_PORT = isProd ? "" : (import.meta.env.VITE_SERVER_PORT || "8000");
 
 // HTTP API
 export const SERVER_URL = isProd
