@@ -11,17 +11,18 @@ export const connectPrinter = async () => {
     const result = await printerManager.start({});
     if (result.errorCode !== 0) {
         printerManager = null;
+        alert("❌ Printer connection failed: " + result.errorString);
         throw new Error("Start error: " + result.errorString);
     }
 
-    console.log("✅ Printer connected");
+    alert("✅ Printer connected");
     return printerManager;
 };
 
 export const disconnectPrinter = async () => {
     if (printerManager) {
         await printerManager.stop({});
-        console.log("🔌 Printer disconnected");
+        alert("🔌 Printer disconnected");
         printerManager = null;
     }
 };

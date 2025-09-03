@@ -4,7 +4,7 @@ import { RESTO_NAME, RESTO_ADDRESS } from "./configs";
 export const printTicket = async (order, item) => {
     const manager = getPrinterManager();
     if (!manager) {
-        console.warn("⚠️ Printer not connected, ticket ignored.");
+        alert("❌ Printer not connected, ticket ignored.");
         return;
     }
 
@@ -65,8 +65,8 @@ export const printTicket = async (order, item) => {
         result = await manager.doPrint({});
         if (result.errorCode !== 0) throw new Error("doPrint: " + result.errorString);
 
-        console.log(`✅ Ticket ${currentIndex}/${totalItems} printed for item: ${item.name}`);
     } catch (err) {
+        alert("❌ Print error: " + err.message);
         console.error("❌ Print error:", err);
     }
 };

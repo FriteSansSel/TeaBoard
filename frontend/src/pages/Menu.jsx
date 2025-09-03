@@ -13,14 +13,16 @@ const Menu = () => {
         setConnected(await isPrinterConnected());
     };
 
-    // To refresh the connection status at the mount of the component
     useEffect(() => {
-        const timer = setTimeout(() => {
-            checkConnection();
-        }, 1);
+        checkConnection();
 
-        return () => clearTimeout(timer);
+        const interval = setInterval(() => {
+            checkConnection();
+        }, 3000);
+
+        return () => clearInterval(interval);
     }, []);
+
 
     const handleConnect = async () => {
         try {

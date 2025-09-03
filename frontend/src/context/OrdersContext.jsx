@@ -91,7 +91,6 @@ export const OrdersProvider = ({ children }) => {
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                console.log("📩 WebSocket message received :", data);
 
                 if (data.type === "ORDER_ENDED") {
                     const newOrders = data.payload;
@@ -100,9 +99,7 @@ export const OrdersProvider = ({ children }) => {
                         for (const order of newOrders) {
                             for (const item of order.items) {
                                 try {
-                                    console.log(`🖨️ Ticket printing for ${item.name}`);
                                     await enqueuePrint(order, item);
-                                    console.log(`✅ Ticket printed for ${item.name}`);
                                 } catch (err) {
                                     console.error(`❌ Print error for ${item.name}`, err);
                                 }
@@ -161,7 +158,6 @@ export const OrdersProvider = ({ children }) => {
                 }
                 return order;
             });
-            console.log('Updated orders after ready item:', updatedOrders);
             localStorage.setItem('orders', JSON.stringify(updatedOrders));
             return updatedOrders;
         });
