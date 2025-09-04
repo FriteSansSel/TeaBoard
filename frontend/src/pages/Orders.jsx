@@ -9,19 +9,16 @@ const Orders = () => {
     const { orders, setOrders } = useOrders();
 
     const removeOrder = async (orderId) => {
-         try {
-            await fetch(`${SERVER_URL}/orders/saved/${orderId}`, {
+        try {
+            const res = await fetch(`${SERVER_URL}/orders/saved/${orderId}`, {
                 method: "DELETE",
             });
-
-            const updated = orders.filter(o => o.id !== orderId);
-            setOrders(updated);
+            if (!res.ok) throw new Error("Failed to delete order");
 
         } catch (err) {
             console.error("❌ Error deleting order:", err);
             alert("Unable to delete order (backend)");
         }
-        // localStorage.setItem('orders', JSON.stringify(updated));
     };
 
     return (

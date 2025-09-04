@@ -1,10 +1,12 @@
 import { Router } from 'express';
 // import { getOrders, getOrdersWithQRCode } from '../controllers/OrdersController.js';
-import { savedOrders, deleteAllOrders, deleteSingleOrder } from '../controllers/OrdersController.js';
+import { savedOrders, deleteAllOrders, deleteSingleOrder, updateOrder } from '../controllers/OrdersController.js';
 
 const ordersRouter = Router();
 
 ordersRouter.get('/saved', savedOrders);
+
+ordersRouter.put('/saved/:id', updateOrder);
 
 ordersRouter.delete('/saved', deleteAllOrders);
 

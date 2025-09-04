@@ -72,14 +72,6 @@ export const OrdersProvider = ({ children }) => {
     // }, []);
 
     useEffect(() => {
-        connectPrinter();
-
-        return () => {
-            disconnectPrinter();
-        };
-    }, []);
-
-    useEffect(() => {
         const fetchSavedOrders = async () => {
             try {
                 const res = await fetch(`${SERVER_URL}/orders/saved`);
@@ -148,6 +140,20 @@ export const OrdersProvider = ({ children }) => {
                     return updated;
                     });
                 }
+
+                if (data.type === "ORDER_UPDATED") {
+                    const updatedOrder = data.payload;
+                    setOrders(prevOrders => {
+                        return prevOrders.map(o =>
+                            o.id === updatedOrder.id ? updatedOrder : o
+                        );
+                    });
+                }
+
+                if (data.type === "ORDER_DELETED") {
+                    const { id } = data.payload;
+                    setOrders(prevOrders => prevOrders.filter(o => o.id !== id));
+                }
             };
 
             ws.onclose = () => {
@@ -168,31 +174,35 @@ export const OrdersProvider = ({ children }) => {
         };
         }, []);
 
-    const closeItemByQRCode = (qrCode) => {
-        setOrders(prevOrders => {
-            console.log('Item ready by QR code:', qrCode);
-            const updatedOrders = prevOrders.map(order => {
-                if (qrCode.orderId === order.id) {
-                    const updatedItems = order.items.map(item => 
-                        qrCode.itemId === item.id
-                            ? { ...item, status: 'ready' }
-                            : item
-                    );
-                    const allReady = updatedItems.every(item => item.status === 'ready');
+    const closeItemByQRCode = async (qrCode) => {
+        const orderToUpdate = orders.find(o => o.id === qrCode.orderId);
+        if (!orderToUpdate) return;
 
-                    if (allReady) {console.log('All items ready for order:', order.id);}
+        const updatedItems = orderToUpdate.items.map(item =>
+            qrCode.itemId === item.id
+                ? { ...item, status: 'ready' }
+                : item
+        );
+        const allReady = updatedItems.every(i => i.status === 'ready');
 
-                    return {
-                        ...order,
-                        items: updatedItems,
-                        status: allReady ? 'ready' : order.status,
-                    };
-                }
-                return order;
+        const updatedOrder = {
+            ...orderToUpdate,
+            items: updatedItems,
+            status: allReady ? 'ready' : orderToUpdate.status,
+        };
+
+        try {
+            const res = await fetch(`${SERVER_URL}/orders/saved/${orderToUpdate.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedOrder)
             });
-            // localStorage.setItem('orders', JSON.stringify(updatedOrders));
-            return updatedOrders;
-        });
+
+            if (!res.ok) throw new Error("Failed to update order");
+
+        } catch (err) {
+            console.error("❌ Error updating order:", err);
+        }
     };
 
     // useEffect(() => {

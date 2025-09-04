@@ -1,7 +1,7 @@
 import { GenerateQRCode } from '../utils/functions.js';
 import { ZELTY_API, API_KEY } from '../utils/configs.js';
 import { routesZelty } from '../utils/constants.js';
-import { saveOrder, getAllOrders, clearAllOrders, deleteOrder } from '../utils/redisService.js';
+import { saveOrder, getAllOrders, clearAllOrders, deleteOrder, getOrder } from '../utils/redisService.js';
 
 export const getOrders = async (req, res) => {
     const params = new URLSearchParams(req.query).toString();
@@ -91,12 +91,42 @@ export const deleteSingleOrder = async (req, res) => {
 
     try {
         await deleteOrder(id);
+
+        const { broadcast } = await import("../server.js");
+        broadcast({ type: "ORDER_DELETED", payload: { id } });
+
         res.json({ message: `Order ${id} deleted successfully` });
     } catch (err) {
         console.error(`Error deleting order ${id} from KV:`, err);
         res.status(500).json({ message: `Error deleting order ${id} from KV` });
     }
 };
+
+
+export const updateOrder = async (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+
+    try {
+        const existing = await getOrder(id);
+        if (!existing) {
+            return res.status(404).json({ message: `Order ${id} not found` });
+        }
+
+        const updatedOrder = { ...existing, ...updates };
+
+        await saveOrder(updatedOrder);
+
+        const { broadcast } = await import("../server.js");
+        broadcast({ type: "ORDER_UPDATED", payload: updatedOrder });
+
+        res.json(updatedOrder);
+    } catch (err) {
+        console.error(`❌ Error updating order ${id}:`, err);
+        res.status(500).json({ message: "Error updating order" });
+    }
+};
+
 
 // API endpoint to get orders with QR codes (internal function not for multiple orders, need to change it to make this
 // function work)

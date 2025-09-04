@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { routes } from "../utils/constants";
-import CastButton from "../components/CastButton";
+// import CastButton from "../components/CastButton";
 import "./Menu.css";
 import { connectPrinter, disconnectPrinter, isPrinterConnected } from "../utils/printerService";
 
@@ -47,7 +47,7 @@ const Menu = () => {
     return (
         <div className="container">
             <h1 className="title">Bienvenue sur TeaBoard</h1>
-            <CastButton />
+            {/* <CastButton /> */}
 
             <button className="button" onClick={() => navigate(routes.orders)}>Commandes</button>
             <button className="button" onClick={() => window.open(routes.ordersstate)}>État des commandes</button>
