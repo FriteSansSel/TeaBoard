@@ -1,6 +1,7 @@
 import { GenerateQRCode } from '../utils/functions.js';
 import { ZELTY_API, API_KEY } from '../utils/configs.js';
 import { routesZelty } from '../utils/constants.js';
+import { saveOrder, getAllOrders, clearAllOrders, deleteOrder } from '../utils/redisService.js';
 
 export const getOrders = async (req, res) => {
     const params = new URLSearchParams(req.query).toString();
@@ -35,7 +36,6 @@ export const fetchOrderWithQRCodeInternal = async (params) => {
     });
 
     const data = await response.json();
-
     const order = data.order;
 
     if (!order || !order.items) {
@@ -51,10 +51,51 @@ export const fetchOrderWithQRCodeInternal = async (params) => {
         })
     );
 
-    return {
+    const fullOrder = {
         ...order,
         items: itemsWithQRCode,
     };
+
+    try {
+        await saveOrder(fullOrder);
+        console.log(`✅ Order ${order.id} saved in KV`);
+    } catch (err) {
+        console.error(`❌ Failed to save order ${order.id}:`, err);
+    }
+
+    return fullOrder;
+};
+
+export const savedOrders = async (req, res) => {
+    try {
+        const orders = await getAllOrders();
+        res.json(orders);
+    } catch (err) {
+        console.error('Error fetching saved orders from KV:', err);
+        res.status(500).json({ message: 'Error fetching saved orders from KV' });
+    }
+};
+
+export const deleteAllOrders = async (req, res) => {
+    try {
+        await clearAllOrders();
+        res.json({ message: 'All saved orders deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting saved orders from KV:', err);
+        res.status(500).json({ message: 'Error deleting saved orders from KV' });
+    }
+};
+
+export const deleteSingleOrder = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await deleteOrder(id);
+        res.json({ message: `Order ${id} deleted successfully` });
+    } catch (err) {
+        console.error(`Error deleting order ${id} from KV:`, err);
+        res.status(500).json({ message: `Error deleting order ${id} from KV` });
+    }
 };
 
 // API endpoint to get orders with QR codes (internal function not for multiple orders, need to change it to make this

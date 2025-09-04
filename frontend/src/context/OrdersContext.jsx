@@ -2,40 +2,39 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 // import { fetchOrdersWithQRCode, fetchOrders } from '../API/OrdersAPI';
 import { connectPrinter, disconnectPrinter } from '../utils/printerService';
 import { enqueuePrint } from "../utils/printQueue";
-import { WS_URL } from '../utils/configs';
+import { WS_URL, SERVER_URL } from '../utils/configs';
 
 const OrdersContext = createContext();
 export const useOrders = () => useContext(OrdersContext);
 
 export const OrdersProvider = ({ children }) => {
-    const PORT = import.meta.env.PORT || "8000";
-    const SERVER_DOMAIN = import.meta.env.SERVER_DOMAIN || "localhost";
-    const [orders, setOrders] = useState(() => {
-        const saved = localStorage.getItem('orders');
+    const [orders, setOrders] = useState([]);
+    // const [orders, setOrders] = useState(() => {
+    //     const saved = localStorage.getItem('orders');
 
-        if (saved) {
-            try {
-                const savedOrders = JSON.parse(saved);
+    //     if (saved) {
+    //         try {
+    //             const savedOrders = JSON.parse(saved);
 
-                const today = new Date().toISOString().split('T')[0];
+    //             const today = new Date().toISOString().split('T')[0];
 
-                const validOrders = savedOrders.filter(o => {
-                    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
-                    return orderDate === today;
-                })
+    //             const validOrders = savedOrders.filter(o => {
+    //                 const orderDate = new Date(o.created_at).toISOString().split('T')[0];
+    //                 return orderDate === today;
+    //             })
 
-                if (validOrders.length !== savedOrders.length) {
-                    localStorage.setItem('orders', JSON.stringify(validOrders));
-                }
+    //             if (validOrders.length !== savedOrders.length) {
+    //                 localStorage.setItem('orders', JSON.stringify(validOrders));
+    //             }
                 
-                return validOrders;
-            } catch (error) {
-                console.error('Error parsing saved orders:', error);
-                // localStorage.removeItem('orders');
-            }
-        }
-        return [];
-    });
+    //             return validOrders;
+    //         } catch (error) {
+    //             console.error('Error parsing saved orders:', error);
+    //             // localStorage.removeItem('orders');
+    //         }
+    //     }
+    //     return [];
+    // });
 
     // const params = "from=2025-08-28&to=2025-08-28&expand[]=items&expand[]=transactions.method&expand[]=transactions";
     // useEffect(() => {
@@ -81,6 +80,38 @@ export const OrdersProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        const fetchSavedOrders = async () => {
+            try {
+                const res = await fetch(`${SERVER_URL}/orders/saved`);
+                if (!res.ok) throw new Error("Failed to fetch saved orders");
+                const allOrders = await res.json();
+
+                const today = new Date().toISOString().split('T')[0];
+
+                const validOrders = allOrders.filter(o => {
+                    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
+                    return orderDate === today;
+                });
+
+                setOrders(validOrders);
+
+                const oldOrders = allOrders.filter(o => {
+                    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
+                    return orderDate !== today;
+                });
+
+                for (const old of oldOrders) {
+                    await fetch(`${SERVER_URL}/orders/saved/${old.id}`, { method: "DELETE" });
+                }
+            } catch (err) {
+                console.error("❌ Error fetching saved orders:", err);
+            }
+        };
+
+        fetchSavedOrders();
+    }, []);
+
+    useEffect(() => {
         let ws;
 
         const connect = () => {
@@ -113,7 +144,7 @@ export const OrdersProvider = ({ children }) => {
                         ...newOrders,
                         ...prevOrders.filter((o) => !newOrders.some((no) => no.id === o.id)),
                     ];
-                    localStorage.setItem("orders", JSON.stringify(updated));
+                    // localStorage.setItem("orders", JSON.stringify(updated));
                     return updated;
                     });
                 }
@@ -159,28 +190,28 @@ export const OrdersProvider = ({ children }) => {
                 }
                 return order;
             });
-            localStorage.setItem('orders', JSON.stringify(updatedOrders));
+            // localStorage.setItem('orders', JSON.stringify(updatedOrders));
             return updatedOrders;
         });
     };
 
-    useEffect(() => {
-        const handleStorageChange = (event) => {
-            if (event.key === 'orders') {
-                try {
-                    const updatedOrders = JSON.parse(event.newValue);
-                    setOrders(updatedOrders);
-                } catch (e) {
-                    console.error('Error parsing orders from storage event:', e);
-                }
-            }
-        };
+    // useEffect(() => {
+    //     const handleStorageChange = (event) => {
+    //         if (event.key === 'orders') {
+    //             try {
+    //                 const updatedOrders = JSON.parse(event.newValue);
+    //                 setOrders(updatedOrders);
+    //             } catch (e) {
+    //                 console.error('Error parsing orders from storage event:', e);
+    //             }
+    //         }
+    //     };
 
-        window.addEventListener('storage', handleStorageChange);
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []);
+    //     window.addEventListener('storage', handleStorageChange);
+    //     return () => {
+    //         window.removeEventListener('storage', handleStorageChange);
+    //     };
+    // }, []);
 
     return (
         <OrdersContext.Provider value={{ orders, setOrders, closeItemByQRCode }}>

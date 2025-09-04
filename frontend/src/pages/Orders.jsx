@@ -2,15 +2,26 @@ import React from 'react';
 import { useOrders } from '../context/OrdersContext';
 import BackButton from '../components/BackButton';
 import { enqueuePrint } from "../utils/printQueue";
+import { SERVER_URL } from "../utils/configs"; 
 import './Orders.css';
 
 const Orders = () => {
     const { orders, setOrders } = useOrders();
 
-    const removeOrder = (orderId) => {
-        const updated = orders.filter(o => o.id !== orderId);
-        setOrders(updated);
-        localStorage.setItem('orders', JSON.stringify(updated));
+    const removeOrder = async (orderId) => {
+         try {
+            await fetch(`${SERVER_URL}/orders/saved/${orderId}`, {
+                method: "DELETE",
+            });
+
+            const updated = orders.filter(o => o.id !== orderId);
+            setOrders(updated);
+
+        } catch (err) {
+            console.error("❌ Error deleting order:", err);
+            alert("Unable to delete order (backend)");
+        }
+        // localStorage.setItem('orders', JSON.stringify(updated));
     };
 
     return (

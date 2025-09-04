@@ -31,7 +31,7 @@ const CastButton = () => {
     }, []);
 
     return (
-        <div style={{ position: 'fixed', top: 10, right: 10 }}>
+        <div style={{ position: 'fixed', top: 10, right: 10, width: 50 }}>
             <google-cast-launcher
                 style={{
                     width: 18,
