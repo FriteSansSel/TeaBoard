@@ -115,7 +115,6 @@ export const OrdersProvider = ({ children }) => {
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-
                 if (data.type === "ORDER_ENDED") {
                     const newOrders = data.payload;
 
@@ -152,7 +151,7 @@ export const OrdersProvider = ({ children }) => {
 
                 if (data.type === "ORDER_DELETED") {
                     const { id } = data.payload;
-                    setOrders(prevOrders => prevOrders.filter(o => o.id !== id));
+                    setOrders(prevOrders => prevOrders.filter(o => String(o.id) !== String(id)));
                 }
             };
 

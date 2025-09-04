@@ -88,7 +88,6 @@ export const deleteAllOrders = async (req, res) => {
 
 export const deleteSingleOrder = async (req, res) => {
     const { id } = req.params;
-
     try {
         await deleteOrder(id);
 
